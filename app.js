@@ -6,6 +6,8 @@ const amount = document.getElementById('amount');
 const balance = document.getElementById('balance');
 const money_plus = document.getElementById('money-plus');
 const money_minus = document.getElementById('money-minus');
+let currentFilter = 'all';
+const filterBtns = document.querySelectorAll('.filter-btn');
 
 // Get transactions from local storage, or start with an empty array if none exist
 const localStorageTransactions = JSON.parse(
@@ -29,8 +31,8 @@ function addTransactionDOM(transaction) {
   // Insert the HTML inside the li
   // Locate this line inside addTransactionDOM and change it to:
 item.innerHTML = `
-  ${transaction.text} <span>${sign}$${Math.abs(transaction.amount)}</span>
-  <button class="delete-btn" onclick="removeTransaction(${transaction.id})">x</button>
+${transaction.text} <span>${sign}$${Math.abs(transaction.amount)}</span>
+<button class="delete-btn" onclick="removeTransaction(${transaction.id})">x</button>
 `;
 
   // Actually attach the li to our <ul> in the HTML
@@ -114,8 +116,31 @@ function updateLocalStorage() {
 // 4. Initialize the app (Run the logic)
 function init() {
   list.innerHTML = '';
-  transactions.forEach(addTransactionDOM);
-  updateValues(); // Add this line!
+
+  // 1. Decide which transactions to show based on the currentFilter
+  const filteredTransactions = transactions.filter(t => {
+    if (currentFilter === 'income') return t.amount > 0;
+    if (currentFilter === 'expense') return t.amount < 0;
+    return true; // 'all'
+  });
+
+  // 2. Only show the filtered ones in the DOM
+  filteredTransactions.forEach(addTransactionDOM);
+  
+  // 3. BUT, always calculate the total based on ALL transactions
+  updateValues();
 }
 
 init();
+
+filterBtns.forEach(btn => {
+  btn.addEventListener('click', (e) => {
+    // Remove 'active' class from all buttons and add to the clicked one
+    filterBtns.forEach(b => b.classList.remove('active'));
+    e.target.classList.add('active');
+
+    // Update the current filter and re-run the app logic
+    currentFilter = e.target.getAttribute('data-filter');
+    init();
+  });
+});
