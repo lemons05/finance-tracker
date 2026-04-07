@@ -1,4 +1,5 @@
 // 1. Select the DOM elements
+const searchInput = document.getElementById('search');
 const list = document.getElementById('list');
 const form = document.getElementById('form');
 const text = document.getElementById('text');
@@ -116,18 +117,23 @@ function updateLocalStorage() {
 // 4. Initialize the app (Run the logic)
 function init() {
   list.innerHTML = '';
+  const searchTerm = searchInput.value.toLowerCase(); // 1. Get search text
 
-  // 1. Decide which transactions to show based on the currentFilter
   const filteredTransactions = transactions.filter(t => {
-    if (currentFilter === 'income') return t.amount > 0;
-    if (currentFilter === 'expense') return t.amount < 0;
-    return true; // 'all'
+    // 2. Check Category Filter
+    const matchesCategory = 
+      currentFilter === 'all' || 
+      (currentFilter === 'income' && t.amount > 0) || 
+      (currentFilter === 'expense' && t.amount < 0);
+
+    // 3. Check Search Text
+    const matchesSearch = t.text.toLowerCase().includes(searchTerm);
+
+    // 4. ONLY return true if BOTH are true
+    return matchesCategory && matchesSearch;
   });
 
-  // 2. Only show the filtered ones in the DOM
   filteredTransactions.forEach(addTransactionDOM);
-  
-  // 3. BUT, always calculate the total based on ALL transactions
   updateValues();
 }
 
@@ -144,3 +150,5 @@ filterBtns.forEach(btn => {
     init();
   });
 });
+
+searchInput.addEventListener('input', init);

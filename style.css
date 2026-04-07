@@ -140,3 +140,15 @@ input[type='number'] {
   background: #9c88ff;
   color: #fff;
 }
+
+.search-container {
+  margin-bottom: 10px;
+}
+
+#search {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #dedede;
+  border-radius: 4px;
+  font-size: 14px;
+}
