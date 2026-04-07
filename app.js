@@ -7,15 +7,13 @@ const balance = document.getElementById('balance');
 const money_plus = document.getElementById('money-plus');
 const money_minus = document.getElementById('money-minus');
 
-// 2. Dummy Data (State)
-const dummyTransactions = [
-  { id: 1, text: 'Flower', amount: -20 },
-  { id: 2, text: 'Salary', amount: 300 },
-  { id: 3, text: 'Book', amount: -10 },
-  { id: 4, text: 'Camera', amount: 150 }
-];
+// Get transactions from local storage, or start with an empty array if none exist
+const localStorageTransactions = JSON.parse(
+  localStorage.getItem('transactions')
+);
 
-let transactions = dummyTransactions;
+let transactions =
+  localStorage.getItem('transactions') !== null ? localStorageTransactions : [];
 
 // 3. Function to add transactions to the DOM list
 function addTransactionDOM(transaction) {
@@ -38,16 +36,6 @@ item.innerHTML = `
   // Actually attach the li to our <ul> in the HTML
   list.appendChild(item);
 }
-
-
-// 4. Initialize the app (Run the logic)
-function init() {
-  list.innerHTML = '';
-  transactions.forEach(addTransactionDOM);
-  updateValues(); // Add this line!
-}
-
-init();
 
 // 5. Update the balance, income and expense
 function updateValues() {
@@ -94,6 +82,7 @@ function addTransaction(e) {
     // Update the UI
     addTransactionDOM(transaction);
     updateValues();
+    updateLocalStorage();
 
     // Clear the input fields
     text.value = '';
@@ -107,6 +96,7 @@ function removeTransaction(id) {
 
   // Re-run the init function to refresh the whole list and math
   init();
+  updateLocalStorage();
 }
 
 // Simple helper function to create a random ID
@@ -115,3 +105,17 @@ function generateID() {
 }
 
 form.addEventListener('submit', addTransaction);
+
+// Update local storage transactions
+function updateLocalStorage() {
+  localStorage.setItem('transactions', JSON.stringify(transactions));
+}
+
+// 4. Initialize the app (Run the logic)
+function init() {
+  list.innerHTML = '';
+  transactions.forEach(addTransactionDOM);
+  updateValues(); // Add this line!
+}
+
+init();
